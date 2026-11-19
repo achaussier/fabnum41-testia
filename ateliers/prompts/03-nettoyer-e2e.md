@@ -1,9 +1,10 @@
 <!--
-Atelier 2 — fichiers à joindre avec --file : le brouillon enregistré par codegen
-(et SPEC.md pour les montants attendus)
+Atelier 2 — fichiers à joindre avec --file : le brouillon enregistré par codegen,
+plus SPEC.md (les règles) et src/Catalog.php (les prix) pour que l'IA puisse calculer les montants attendus.
+Sans eux, elle ne peut pas deviner les montants : elle laissera des « À VÉRIFIER ».
 
 php bin/ia --prompt-file ateliers/prompts/03-nettoyer-e2e.md \
-    --file tests/e2e/brouillon.spec.ts --file SPEC.md \
+    --file tests/e2e/brouillon.spec.ts --file SPEC.md --file src/Catalog.php \
     --out tests/e2e/achat.spec.ts
 -->
 
@@ -19,7 +20,7 @@ Ce que j'attends :
 - supprime les clics et actions inutiles enregistrés par erreur ;
 - un commentaire court par étape du parcours ;
 - ajoute des assertions :
-  - le total du panier (data-testid="cart-total") ;
+  - le total des articles du panier (data-testid="cart-total" : après réduction, hors livraison) ;
   - la ligne de réduction quand un code promo est appliqué (data-testid="cart-discount") ;
   - la confirmation : le texte « Commande confirmée » et un numéro de commande
     visible (data-testid="order-number").
@@ -27,7 +28,7 @@ Ce que j'attends :
 Contraintes :
 - jamais de waitForTimeout : utilise les assertions expect, qui attendent toutes seules ;
 - un await devant chaque action et chaque assertion ;
-- calcule les montants attendus à partir de SPEC.md et des prix visibles dans le brouillon ;
+- calcule les montants attendus à partir de SPEC.md et des prix des fichiers joints ;
   si un montant ne peut pas être déduit, mets un commentaire « À VÉRIFIER » sur la ligne
   au lieu d'inventer une valeur ;
 - n'invente aucun sélecteur ni aucun libellé absent du brouillon.

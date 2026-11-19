@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($errors === []) {
         $_SESSION['order'] = [
             'number' => 'MS-' . random_int(100000, 999999),
-            'date'   => date('d/m/Y'),
             'name'   => $name,
             'total'  => $amounts['total'],
         ];

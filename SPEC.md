@@ -21,6 +21,8 @@ Ils sont affichés au format français : `12,90 €`.
 
 - Quantité entre 1 et 10 par produit ; une quantité ≤ 0 lève une `InvalidArgumentException`.
 - Ajouter un produit déjà présent augmente sa quantité (sans dépasser 10).
+- La page du panier affiche, dans cet ordre : la réduction (si un coupon est appliqué), le **total des articles**
+  (après réduction, hors livraison), la livraison, puis le **total à payer** (articles + livraison).
 
 ## Commande
 
