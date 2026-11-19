@@ -11,7 +11,7 @@
 </head>
 <body>
 <header class="site-header">
-    <a class="brand" href="/"><img src="/img/logo.svg" width="32" height="32"> MiniShop</a>
+    <a class="brand" href="/"><img src="/img/logo.svg" alt="" width="32" height="32"> MiniShop</a>
     <nav aria-label="Navigation principale">
         <a href="/">Catalogue</a>
         <a href="/cart.php">Panier (<?= $cart->count() ?>)</a>

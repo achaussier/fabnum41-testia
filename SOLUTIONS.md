@@ -84,3 +84,24 @@ Une référence par page ; `date-du-jour` est masqué partout, `order-number` su
 - Avec `maxDiffPixelRatio: 0.01`, changer la couleur `--primary` est détecté sur le **catalogue**
   (6 boutons, environ 2 % de la page), mais pas forcément sur le panier, où le seul bouton bleu représente
   moins de 1 % des pixels. Bon sujet de discussion sur le réglage de la tolérance.
+
+## Bonus A — Accessibilité
+
+Fichier : `tests/e2e/accessibilite.spec.ts` (axe-core sur les 4 pages).
+
+Sur `main`, ce test échoue sur chaque page avec deux violations, laissées exprès :
+
+| Règle axe | Où | Correction faite sur cette branche |
+|---|---|---|
+| `image-alt` | logo de l'en-tête, `templates/header.php` : `<img>` sans attribut `alt` | `alt=""` (image décorative, le texte « MiniShop » suit) |
+| `color-contrast` | pied de page, `public/style.css` : `#a8b3bd` sur `#f5f7fa` (ratio 1,98) | couleur `#52606d` |
+
+Le pied de page ayant changé de couleur, les références visuelles ont été régénérées sur cette branche :
+c'est un changement **voulu**, commité avec le code qui l'explique.
+
+## Bonus D — Intégration continue
+
+Fichier : `.github/workflows/tests.yml` (PHPUnit puis Playwright, rapport conservé).
+
+Tant que le bug volontaire n'est pas corrigé, l'étape PHPUnit est rouge. Les étapes Playwright sont lancées
+quand même (`if: !cancelled()`) et le rapport reste téléchargeable.
