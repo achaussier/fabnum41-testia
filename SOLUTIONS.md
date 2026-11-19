@@ -66,3 +66,9 @@ livraison 4,90 € ; total à payer 38,56 €.
 
 `data-testid="cart-total"` affiche le **total des articles** (après réduction, hors livraison).
 La livraison et le total à payer sont dans `cart-shipping` et `order-total`.
+
+## Atelier 3 — Preuves
+
+- `playwright.config.ts` : `screenshot: 'only-on-failure'`, `video: 'retain-on-failure'`, `trace: 'retain-on-failure'`.
+- `tests/e2e/captures.spec.ts` : une capture de chaque page dans `docs/captures/`, plus une capture jointe au rapport.
+- `docs/captures/` est dans `.gitignore` : ces images changent à chaque lancement (la date du jour, le numéro de commande).

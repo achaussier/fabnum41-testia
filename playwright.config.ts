@@ -5,6 +5,9 @@ export default defineConfig({
   reporter: [['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:8000',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
