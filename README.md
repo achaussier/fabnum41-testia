@@ -56,7 +56,8 @@ minishop/
 ├── tests/
 │   ├── Unit/          tests PHPUnit
 │   └── e2e/           tests Playwright
-├── ateliers/prompts/  prompts prêts à l'emploi (à utiliser avec --prompt-file)
+├── ateliers/          guides des ateliers
+│   └── prompts/       prompts prêts à l'emploi (à utiliser avec --prompt-file)
 ├── bin/ia             script qui appelle l'API Claude
 ├── SPEC.md            règles métier : la référence
 └── REGLES-IA.md       consignes envoyées à l'IA à chaque appel
@@ -119,6 +120,11 @@ php bin/ia --prompt-file ateliers/prompts/06-diff-visuel.md \
 - `IA_MODEL=claude-haiku-5-5 php bin/ia …` (ou `--model`) change de modèle ; `--no-rules` n'envoie pas `REGLES-IA.md`.
 - **Commitez avant de lancer l'IA** : `git restore` annule tout si le résultat ne convient pas.
 - Relisez chaque test généré, puis lancez-le : l'IA propose, vous vérifiez, vous décidez.
+
+## Les ateliers
+
+Un guide pas à pas par atelier, avec ce que vous devez voir à chaque étape et un encadré « Si ça coince » :
+**[ateliers/README.md](ateliers/README.md)**.
 
 ## Les prompts des ateliers
 

@@ -2,10 +2,7 @@
 Atelier 1 — fichiers à joindre avec --file : src/CouponValidator.php, src/Coupon.php,
 src/InvalidCouponException.php et SPEC.md
 
-php bin/ia --prompt-file ateliers/prompts/02-coupons.md \
-    --file src/CouponValidator.php --file src/Coupon.php \
-    --file src/InvalidCouponException.php --file SPEC.md \
-    --out tests/Unit/CouponValidatorTest.php
+php bin/ia --prompt-file ateliers/prompts/02-coupons.md --file src/CouponValidator.php --file src/Coupon.php --file src/InvalidCouponException.php --file SPEC.md --out tests/Unit/CouponValidatorTest.php
 -->
 
 Écris des tests PHPUnit 13 pour la méthode validate() de src/CouponValidator.php (fichier joint).

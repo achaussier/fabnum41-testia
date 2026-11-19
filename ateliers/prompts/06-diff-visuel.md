@@ -2,10 +2,7 @@
 Atelier 4 — à joindre avec --image, dans cet ordre : attendu, obtenu, différence
 (les trois fichiers sont dans test-results/ après un test visuel en échec)
 
-php bin/ia --prompt-file ateliers/prompts/06-diff-visuel.md \
-    --image test-results/<dossier-du-test>/catalogue-expected.png \
-    --image test-results/<dossier-du-test>/catalogue-actual.png \
-    --image test-results/<dossier-du-test>/catalogue-diff.png
+php bin/ia --prompt-file ateliers/prompts/06-diff-visuel.md --image test-results/<dossier-du-test>/catalogue-expected.png --image test-results/<dossier-du-test>/catalogue-actual.png --image test-results/<dossier-du-test>/catalogue-diff.png
 
 (on peut ajouter le résultat de « git diff public/style.css » dans un fichier joint avec --file)
 -->

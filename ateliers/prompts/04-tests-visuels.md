@@ -1,10 +1,7 @@
 <!--
 Atelier 4 — fichiers à joindre avec --file : les pages de public/ et l'en-tête commun
 
-php bin/ia --prompt-file ateliers/prompts/04-tests-visuels.md \
-    --file public/index.php --file public/cart.php --file public/checkout.php \
-    --file public/confirmation.php --file templates/header.php \
-    --out tests/e2e/visuel.spec.ts
+php bin/ia --prompt-file ateliers/prompts/04-tests-visuels.md --file public/index.php --file public/cart.php --file public/checkout.php --file public/confirmation.php --file templates/header.php --out tests/e2e/visuel.spec.ts
 -->
 
 Écris des tests de régression visuelle Playwright pour l'application MiniShop,

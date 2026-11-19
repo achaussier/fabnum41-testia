@@ -3,9 +3,7 @@ Atelier 2 — fichiers à joindre avec --file : le brouillon enregistré par cod
 plus SPEC.md (les règles) et src/Catalog.php (les prix) pour que l'IA puisse calculer les montants attendus.
 Sans eux, elle ne peut pas deviner les montants : elle laissera des « À VÉRIFIER ».
 
-php bin/ia --prompt-file ateliers/prompts/03-nettoyer-e2e.md \
-    --file tests/e2e/brouillon.spec.ts --file SPEC.md --file src/Catalog.php \
-    --out tests/e2e/achat.spec.ts
+php bin/ia --prompt-file ateliers/prompts/03-nettoyer-e2e.md --file tests/e2e/brouillon.spec.ts --file SPEC.md --file src/Catalog.php --out tests/e2e/achat.spec.ts
 -->
 
 Le fichier joint tests/e2e/brouillon.spec.ts est un enregistrement brut produit par

@@ -1,9 +1,7 @@
 <!--
 Atelier 1 — fichiers à joindre avec --file : src/PriceCalculator.php et SPEC.md
 
-php bin/ia --prompt-file ateliers/prompts/01-tests-prix.md \
-    --file src/PriceCalculator.php --file SPEC.md \
-    --out tests/Unit/PriceCalculatorTest.php
+php bin/ia --prompt-file ateliers/prompts/01-tests-prix.md --file src/PriceCalculator.php --file SPEC.md --out tests/Unit/PriceCalculatorTest.php
 
 (pour aller plus loin : joindre aussi src/Coupon.php, l'IA verra alors la vraie classe)
 -->

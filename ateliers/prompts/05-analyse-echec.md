@@ -1,12 +1,12 @@
 <!--
-Atelier 3 — à joindre : le message d'erreur et le test avec --file, la capture avec --image
+Atelier 3 — à joindre : le message d'erreur et le test avec --file, la capture avec --image.
+Après un échec, Playwright range tout dans test-results/<dossier-du-test>/ :
+error-context.md (le message d'erreur) et test-failed-1.png (la capture).
 
-php bin/ia --prompt-file ateliers/prompts/05-analyse-echec.md \
-    --file erreur.txt --file tests/e2e/achat.spec.ts \
-    --image test-results/<dossier-du-test>/test-failed-1.png
+php bin/ia --prompt-file ateliers/prompts/05-analyse-echec.md --file test-results/<dossier-du-test>/error-context.md --file tests/e2e/achat.spec.ts --file SPEC.md --image test-results/<dossier-du-test>/test-failed-1.png
 
-(erreur.txt : collez-y le message d'erreur du terminal, ou le contenu du bouton
-« Copy prompt » du rapport HTML. On peut aussi joindre SPEC.md.)
+(variante : coller dans un fichier erreur.txt le message du terminal, ou le contenu du bouton
+« Copy prompt » du rapport HTML, et le joindre avec --file erreur.txt)
 -->
 
 Ce test Playwright échoue. Voici le message d'erreur, le test et la capture au moment de
