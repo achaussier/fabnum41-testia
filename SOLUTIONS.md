@@ -72,3 +72,15 @@ La livraison et le total à payer sont dans `cart-shipping` et `order-total`.
 - `playwright.config.ts` : `screenshot: 'only-on-failure'`, `video: 'retain-on-failure'`, `trace: 'retain-on-failure'`.
 - `tests/e2e/captures.spec.ts` : une capture de chaque page dans `docs/captures/`, plus une capture jointe au rapport.
 - `docs/captures/` est dans `.gitignore` : ces images changent à chaque lancement (la date du jour, le numéro de commande).
+
+## Atelier 4 — Régression visuelle
+
+Fichiers : `tests/e2e/visuel.spec.ts` et ses références dans `tests/e2e/visuel.spec.ts-snapshots/`.
+Une référence par page ; `date-du-jour` est masqué partout, `order-number` sur la confirmation.
+
+- Les références ont été générées sous **Linux** (`*-chromium-linux.png`). Sur macOS ou Windows, Playwright
+  cherche d'autres fichiers (`-darwin`, `-win32`) : le premier lancement échoue en créant les références,
+  le second est vert. C'est le comportement décrit dans le guide.
+- Avec `maxDiffPixelRatio: 0.01`, changer la couleur `--primary` est détecté sur le **catalogue**
+  (6 boutons, environ 2 % de la page), mais pas forcément sur le panier, où le seul bouton bleu représente
+  moins de 1 % des pixels. Bon sujet de discussion sur le réglage de la tolérance.
