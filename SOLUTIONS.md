@@ -55,3 +55,14 @@ Dans `PriceCalculatorTest.php`, le cas `'pile 50 euros' => [5000, 0]` suit la sp
 ### Casser exprès (partie B)
 
 Les trois modifications proposées dans le guide font chacune échouer 3 ou 4 tests supplémentaires.
+
+## Atelier 2 — Parcours d'achat
+
+Fichiers : `tests/e2e/achat.spec.ts` (parcours complet avec `BIENVENUE10`), `coupon.spec.ts`
+(code inconnu, code expiré, `LIVRAISON`), `commande.spec.ts` (champs obligatoires, e-mail mal formé).
+
+Calcul du parcours : 12,90 € + 24,50 € = 37,40 € ; réduction de 10 % = 3,74 € ; total des articles 33,66 € ;
+livraison 4,90 € ; total à payer 38,56 €.
+
+`data-testid="cart-total"` affiche le **total des articles** (après réduction, hors livraison).
+La livraison et le total à payer sont dans `cart-shipping` et `order-total`.
