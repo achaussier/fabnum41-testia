@@ -1,0 +1,212 @@
+#!/usr/bin/env php
+<?php
+/**
+ * bin/ia — envoie une consigne, des fichiers et des images à l'API Claude.
+ *
+ * Formation « Tester avec l'IA » — outil volontairement simple et lisible :
+ * une requête HTTP, une réponse JSON. Aucune dépendance (extension curl uniquement).
+ *
+ * Exemples :
+ *   php bin/ia "Explique ce projet en 10 lignes" --file README.md --file SPEC.md
+ *   php bin/ia --prompt-file ateliers/prompts/01-tests-prix.md \
+ *       --file src/PriceCalculator.php --file SPEC.md \
+ *       --out tests/Unit/PriceCalculatorTest.php
+ *   php bin/ia "Décris les différences" --image attendu.png --image obtenu.png --image diff.png
+ *   php bin/ia "..." --file SPEC.md --dry-run        (affiche la requête sans l'envoyer)
+ *
+ * Variables d'environnement :
+ *   ANTHROPIC_API_KEY  (obligatoire, jamais dans le dépôt)
+ *   IA_MODEL           (facultatif, défaut : claude-sonnet-5-5)
+ *   IA_API_URL         (facultatif, pour un proxy ou un serveur de test)
+ */
+
+declare(strict_types=1);
+
+const API_URL        = 'https://api.anthropic.com/v1/messages';
+const API_VERSION    = '2023-06-01';
+const DEFAULT_MODEL  = 'claude-sonnet-5-5';
+const MAX_TOKENS     = 8000;
+const RULES_FILE     = 'REGLES-IA.md';
+const MAX_FILE_BYTES = 200_000;
+
+// ---------------------------------------------------------------- arguments
+function usage(int $code = 0): never
+{
+    fwrite($code ? STDERR : STDOUT, <<<TXT
+    Usage : php bin/ia ["consigne"] [options]
+
+      --prompt-file F   lit la consigne dans un fichier (ajoutée à la consigne en ligne)
+      --file F          joint un fichier texte (répétable)
+      --image F         joint une image PNG/JPEG/WebP/GIF (répétable)
+      --out F           écrit le 1er bloc de code de la réponse dans F
+      --force           autorise --out à remplacer un fichier existant
+      --model M         modèle à utiliser (défaut : \$IA_MODEL ou claude-sonnet-5-5)
+      --no-rules        n'envoie pas REGLES-IA.md comme consigne système
+      --dry-run         affiche la requête JSON (sans la clé) et ne l'envoie pas
+      -h, --help        cette aide
+
+    TXT);
+    exit($code);
+}
+
+function fail(string $message): never
+{
+    fwrite(STDERR, "✘ $message\n");
+    exit(1);
+}
+
+$opts = ['prompt' => [], 'files' => [], 'images' => [], 'out' => null, 'force' => false,
+         'model' => getenv('IA_MODEL') ?: DEFAULT_MODEL, 'rules' => true, 'dry' => false];
+
+$args = array_slice($argv, 1);
+if ($args === []) {
+    usage(1);
+}
+for ($i = 0; $i < count($args); $i++) {
+    $a = $args[$i];
+    $next = function () use ($args, &$i, $a): string {
+        if (!isset($args[$i + 1])) {
+            fail("l'option $a attend une valeur");
+        }
+        return $args[++$i];
+    };
+    match ($a) {
+        '-h', '--help'  => usage(),
+        '--prompt-file' => $opts['prompt'][] = readText($next()),
+        '--file'        => $opts['files'][] = $next(),
+        '--image'       => $opts['images'][] = $next(),
+        '--out'         => $opts['out'] = $next(),
+        '--force'       => $opts['force'] = true,
+        '--model'       => $opts['model'] = $next(),
+        '--no-rules'    => $opts['rules'] = false,
+        '--dry-run'     => $opts['dry'] = true,
+        default         => str_starts_with($a, '--') ? fail("option inconnue : $a") : $opts['prompt'][] = $a,
+    };
+}
+
+function readText(string $path): string
+{
+    if (!is_file($path)) {
+        fail("fichier introuvable : $path");
+    }
+    if (filesize($path) > MAX_FILE_BYTES) {
+        fail("fichier trop gros (> 200 Ko) : $path");
+    }
+    return (string) file_get_contents($path);
+}
+
+$instruction = trim(implode("\n\n", $opts['prompt']));
+if ($instruction === '') {
+    fail('aucune consigne : donnez un texte entre guillemets ou --prompt-file');
+}
+
+// ---------------------------------------------------------------- requête
+// L'IA ne voit QUE ce qu'on lui envoie : chaque fichier est recopié dans le message.
+$content = [];
+foreach ($opts['images'] as $img) {
+    $types = ['png' => 'image/png', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
+              'webp' => 'image/webp', 'gif' => 'image/gif'];
+    $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+    if (!is_file($img) || !isset($types[$ext])) {
+        fail("image introuvable ou format non géré : $img");
+    }
+    $content[] = ['type' => 'text', 'text' => "Image suivante : $img"];
+    $content[] = ['type' => 'image', 'source' => [
+        'type' => 'base64', 'media_type' => $types[$ext],
+        'data' => base64_encode((string) file_get_contents($img)),
+    ]];
+}
+$text = '';
+foreach ($opts['files'] as $f) {
+    $text .= "<fichier chemin=\"$f\">\n" . readText($f) . "\n</fichier>\n\n";
+}
+$text .= $instruction;
+if ($opts['out'] !== null) {
+    $text .= "\n\nRéponds avec le contenu COMPLET du fichier {$opts['out']} dans un seul bloc de code "
+           . "(aucune partie omise, pas de « … »). Tes remarques éventuelles viennent après le bloc.";
+}
+$content[] = ['type' => 'text', 'text' => $text];
+
+$system = 'Tu aides des développeurs PHP débutants à écrire des tests automatisés. '
+        . 'Réponds en français, de façon concise.';
+if ($opts['rules'] && is_file(RULES_FILE)) {
+    $system .= "\n\nRègles du projet (" . RULES_FILE . ") :\n" . readText(RULES_FILE);
+}
+
+$request = [
+    'model'      => $opts['model'],
+    'max_tokens' => MAX_TOKENS,
+    'system'     => $system,
+    'messages'   => [['role' => 'user', 'content' => $content]],
+];
+
+if ($opts['dry']) {
+    // Pédagogique : on montre exactement ce qui partirait (images abrégées, clé masquée).
+    $shown = $request;
+    foreach ($shown['messages'][0]['content'] as &$part) {
+        if ($part['type'] === 'image') {
+            $part['source']['data'] = '…(' . strlen($part['source']['data']) . ' caractères base64)…';
+        }
+    }
+    unset($part);
+    echo "POST " . API_URL . "\nx-api-key: sk-ant-…(masquée)\nanthropic-version: " . API_VERSION . "\n\n";
+    echo json_encode($shown, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
+    exit(0);
+}
+
+$key = getenv('ANTHROPIC_API_KEY');
+if (!$key) {
+    fail('ANTHROPIC_API_KEY n\'est pas définie (export ANTHROPIC_API_KEY=sk-ant-…)');
+}
+
+// ---------------------------------------------------------------- appel HTTP
+fwrite(STDERR, "… envoi à {$opts['model']}\n");
+$ch = curl_init(getenv('IA_API_URL') ?: API_URL); // IA_API_URL : proxy ou serveur de test
+curl_setopt_array($ch, [
+    CURLOPT_POST           => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT        => 300,
+    CURLOPT_HTTPHEADER     => [
+        'content-type: application/json',
+        'x-api-key: ' . $key,
+        'anthropic-version: ' . API_VERSION,
+    ],
+    CURLOPT_POSTFIELDS     => json_encode($request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+]);
+$raw    = curl_exec($ch);
+$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+if ($raw === false) {
+    fail('erreur réseau : ' . curl_error($ch));
+}
+$data = json_decode((string) $raw, true);
+if ($status !== 200) {
+    fail("l'API a répondu $status : " . ($data['error']['message'] ?? $raw));
+}
+
+$answer = '';
+foreach ($data['content'] ?? [] as $block) {
+    if (($block['type'] ?? '') === 'text') {
+        $answer .= $block['text'];
+    }
+}
+
+// ---------------------------------------------------------------- sortie
+echo $answer, "\n";
+
+if ($opts['out'] !== null) {
+    if (!preg_match('/```[\w-]*\R(.*?)```/s', $answer, $m)) {
+        fail("aucun bloc de code trouvé : {$opts['out']} n'a pas été écrit");
+    }
+    if (($data['stop_reason'] ?? '') === 'max_tokens') {
+        fail("réponse tronquée (limite de longueur atteinte) : {$opts['out']} n'a pas été écrit");
+    }
+    if (is_file($opts['out']) && !$opts['force']) {
+        fail("{$opts['out']} existe déjà : relancez avec --force pour le remplacer");
+    }
+    @mkdir(dirname($opts['out']), 0777, true);
+    file_put_contents($opts['out'], $m[1]);
+    fwrite(STDERR, "✔ fichier écrit : {$opts['out']} — relisez-le, puis lancez les tests.\n");
+}
+
+$u = $data['usage'] ?? [];
+fwrite(STDERR, sprintf("ℹ tokens : %d envoyés, %d reçus\n", $u['input_tokens'] ?? 0, $u['output_tokens'] ?? 0));

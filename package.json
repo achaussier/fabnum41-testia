@@ -1,0 +1,14 @@
+{
+  "name": "minishop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MiniShop PHP — tests de bout en bout (Playwright)",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.20.5"
+  }
+}
