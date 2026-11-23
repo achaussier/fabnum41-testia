@@ -131,3 +131,24 @@ Chiffres de référence à la fin de l'atelier 7 (le test de documentation de l'
 
 Points à vérifier dans une synthèse générée : le total (l'IA additionne-t-elle bien les deux fichiers ?),
 le regroupement (5 tests rouges, mais 3 problèmes), le nom exact des tests, et l'absence de cause inventée pour `createdAt`.
+
+## Atelier 8 — Guide utilisateur et vidéos
+
+- `tests/doc/commande.spec.ts` : « Guide : passer une commande », 5 étapes, données fictives (Camille Dupont, `example.test`).
+- `docs/guide/passer-une-commande.md` : un exemple de guide, relu phrase par phrase contre les captures.
+- `docs/api/index.html` : la documentation de l'API construite par Redocly.
+
+Les captures, la vidéo et les sous-titres ne sont **pas** versionnés (`docs/media/`, `docs/build/`) : pour voir le guide
+avec ses images, il faut les générer.
+
+```bash
+npx playwright test --project=doc
+ffmpeg -y -i docs/media/commande.webm -c:v libx264 -preset veryfast -crf 23 docs/media/commande.mp4
+php bin/sous-titres docs/build/commande.json
+```
+
+C'est le compromis à discuter en séance : un dépôt léger et des captures toujours à jour, mais un guide illisible
+tant qu'on ne l'a pas généré — d'où l'intérêt de le publier depuis la CI (bonus D).
+
+Points à vérifier dans un guide généré par l'IA : un bouton cité existe-t-il sur la capture ? Le numéro de commande
+ou la date ont-ils été recopiés (ils changent à chaque génération) ? Les chemins des images partent-ils bien de `docs/guide/` ?
