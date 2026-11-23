@@ -1,0 +1,59 @@
+name: Tests, rapports et documentation
+
+on: [push, pull_request]
+
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: '8.4' }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: composer install
+      - run: npm ci && npx playwright install --with-deps chromium
+
+      # 1. Les tests. Des échecs sont attendus (défauts volontaires) : on continue pour produire les rapports.
+      - name: Tests unitaires
+        run: vendor/bin/phpunit --log-junit rapports/unit.xml --testdox-html rapports/unit.html
+        continue-on-error: true
+      - name: Tests d'API et de bout en bout
+        run: npx playwright test --project=api --project=e2e
+        continue-on-error: true
+
+      # 2. La documentation : si un test de doc échoue, on s'arrête là (pas de guide périmé publié).
+      - name: Tests de documentation (captures, vidéos, manifestes)
+        run: npx playwright test --project=doc
+      - name: Vidéos .mp4 et sous-titres .vtt
+        run: |
+          sudo apt-get install -y -q ffmpeg
+          for manifeste in docs/build/*.json; do
+            nom=$(basename "$manifeste" .json)
+            ffmpeg -y -i "docs/media/$nom.webm" -c:v libx264 -preset veryfast -crf 23 "docs/media/$nom.mp4"
+            php bin/sous-titres "$manifeste"
+          done
+      - name: Documentation de l'API
+        run: |
+          npx @redocly/cli lint public/openapi.yaml
+          npx @redocly/cli build-docs public/openapi.yaml --output docs/api/index.html
+      - name: Rapport Allure
+        run: npx allure generate ./allure-results
+
+      # 3. Tout est conservé, même si une étape a échoué.
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: rapports
+          path: |
+            rapports/
+            playwright-report/
+            allure-report/
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: documentation
+          path: |
+            docs/
+            !docs/build/
+            !docs/media/*.webm

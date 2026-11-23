@@ -152,3 +152,34 @@ tant qu'on ne l'a pas généré — d'où l'intérêt de le publier depuis la CI
 
 Points à vérifier dans un guide généré par l'IA : un bouton cité existe-t-il sur la capture ? Le numéro de commande
 ou la date ont-ils été recopiés (ils changent à chaque génération) ? Les chemins des images partent-ils bien de `docs/guide/` ?
+
+## Bonus D — Publication en CI
+
+Fichier : `.github/workflows/doc.yml`. À chaque push : tests, rapports (JUnit, HTML, Allure) et documentation
+(captures, vidéos `.mp4`, sous-titres, guide, doc de l'API), conservés en deux artefacts.
+
+Deux choix à discuter :
+
+- les tests unitaires, d'API et E2E sont en `continue-on-error` : tant que les défauts volontaires ne sont pas corrigés,
+  ils sont rouges, et on veut quand même les rapports ;
+- les tests de **documentation**, eux, arrêtent le workflow s'ils échouent : mieux vaut pas de guide qu'un guide faux.
+
+Ce workflow n'a pas été exécuté sur GitHub lors de la préparation.
+
+## Bonus A, B, C et E : essayés, non fournis
+
+Les prompts 11 (sous-titres), 12 (contrat enrichi) et 13 (traçabilité) ont été essayés avec l'API lors de la préparation ;
+leurs résultats dépendent de la réponse de l'IA, il n'y en a pas d'exemple ici. Ce qu'on a observé :
+
+- **Prompt 12** : au premier essai, l'IA a produit un YAML invalide (une description contenant « : » sans guillemets).
+  Le lint l'a signalé tout de suite : c'est exactement pourquoi on le relance après chaque modification.
+  Les schémas et les codes de réponse n'ont pas été modifiés, mais trois descriptions existantes ont été réécrites.
+- **Prompt 13** : la matrice de la boutique signale « Un seul coupon par commande » comme non couverte.
+
+## À savoir sur `bin/ia` : la longueur des réponses
+
+`bin/ia` limite chaque réponse à 16 000 tokens, réflexion du modèle comprise. Avec la limite d'origine (8 000),
+les réponses longues étaient coupées : contrat complet à réécrire, matrice de traçabilité de toute la spec.
+Le script affiche alors « aucun bloc de code trouvé » (le fichier n'est pas écrit, rien n'est perdu).
+Les prompts 07, 12 et 13 demandent toujours une réponse concise, et la traçabilité se fait en deux appels.
+Si cela se produit encore en séance : demander moins d'un coup.
