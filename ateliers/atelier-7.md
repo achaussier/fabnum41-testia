@@ -109,6 +109,7 @@ git commit -m "tests: étapes, étiquettes, rapports JUnit et Allure"
 | `allure generate` ne trouve rien | Lancez la commande depuis la racine du projet, après `npx playwright test`. |
 | Le rapport Allure mélange plusieurs lancements | `allure-results/` s'accumule d'un lancement à l'autre. Supprimez le dossier pour repartir de zéro. |
 | `fichier trop gros (> 200 Ko)` avec `bin/ia` | Un des fichiers JUnit est trop gros. Regardez ce qui le gonfle. |
+| La synthèse parle de dizaines de tests « ignorés » | `rapports/e2e.xml` a été remplacé par un lancement qui n'exécutait rien (`npx playwright test --list`, par exemple). Relancez `npx playwright test`, puis la synthèse. |
 | La synthèse annonce un total faux | Fréquent : l'IA compte mal. Corrigez à la main, ou relancez en donnant les totaux dans la consigne. |
 | La synthèse ne cite qu'un bug | Les deux fichiers JUnit étaient-ils joints ? L'un des bugs est dans les tests unitaires, l'autre dans les tests d'API. |
 | Après `test.step`, un test ne passe plus | Une variable déclarée dans une étape n'existe pas dans la suivante : déclarez-la avant les étapes. |

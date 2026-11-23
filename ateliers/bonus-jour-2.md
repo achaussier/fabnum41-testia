@@ -3,11 +3,13 @@
 ## A — Matrice de traçabilité
 
 Quelles règles de `SPEC.md` ne sont couvertes par aucun test ? Les commandes sont en tête de `ateliers/prompts/13-trace.md`.
+La matrice se fait en deux fois (les règles de la boutique, puis l'API) : une réponse de `bin/ia` a une longueur limitée.
 Contrôlez trois lignes au hasard : les tests cités existent-ils ? Vérifient-ils vraiment la règle ? Puis écrivez un des tests manquants.
 
 ## B — Doc API enrichie
 
 Commitez, puis lancez le prompt 12 (commande en tête de `ateliers/prompts/12-enrichir-openapi.md`).
+Si `bin/ia` répond « aucun bloc de code trouvé », la réponse a été coupée : relancez, le contrat n'a pas été modifié.
 Contrôlez ensuite, dans cet ordre : `git diff public/openapi.yaml` (un schéma a-t-il changé ?), le lint, les tests de contrat.
 
 ## C — Sous-titres reformulés

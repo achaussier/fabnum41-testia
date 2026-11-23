@@ -26,6 +26,9 @@ Ce que tu ne dois PAS modifier — aucune exception :
 
 Règles :
 - le résultat doit rester un fichier OpenAPI 3.1 valide, complet, en YAML ;
+- en YAML, mets entre guillemets tout texte qui contient « : » ou qui commence par un caractère spécial ;
+- va droit au but et reste concis : complète les descriptions manquantes en une ligne, et ajoute au plus
+  un exemple par requête et par réponse (la réponse est limitée en longueur : un fichier trop long serait coupé) ;
 - montants en centimes (entiers), données fictives (e-mails en example.test) ;
 - si un test joint contredit le contrat (champ absent, code différent), ne corrige rien :
   signale-le dans tes remarques après le bloc de code.

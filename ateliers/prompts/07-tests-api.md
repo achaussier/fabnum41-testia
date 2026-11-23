@@ -13,8 +13,8 @@ Prix utiles du catalogue, en centimes : carnet-a5 = 1290, stylo-plume = 2450, la
 
 Ce que j'attends :
 - un test pour chaque code de réponse documenté dans openapi.yaml pour cette route ;
-- pour les réponses 200 : plusieurs paniers (sans coupon, avec chaque coupon valide, autour du seuil de
-  livraison offerte), le corps complet vérifié avec toEqual ;
+- pour les réponses 200 : une table de six paniers au plus (sans coupon, avec chaque coupon valide, juste en dessous
+  du seuil de livraison offerte, pile au seuil, au-dessus), parcourue par une boucle, le corps complet vérifié avec toEqual ;
 - valeurs attendues calculées depuis SPEC.md, avec le calcul en commentaire sur la même ligne.
   Jamais « au hasard », jamais une valeur que tu ne peux pas justifier par une règle ;
 - une table de cas invalides (nom du cas, corps envoyé, code attendu) parcourue par une boucle for,
@@ -22,6 +22,8 @@ Ce que j'attends :
 - pour chaque erreur : vérifie le code, puis que le corps contient un champ error (message) et un champ code.
 
 Contraintes :
+- va droit au but et reste concis : pas de test en double, pas de longs commentaires
+  (la réponse est limitée en longueur : un fichier trop long serait coupé) ;
 - import { test, expect } from '@playwright/test' ; adresses relatives (baseURL est configuré) ;
 - vérifie dans cet ordre : le code, les en-têtes utiles, le corps ;
 - noms des tests en français, qui disent le cas et le résultat attendu ;
