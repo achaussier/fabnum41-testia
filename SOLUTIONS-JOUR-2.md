@@ -65,3 +65,51 @@ Les tests de `securite.spec.ts` le remplacent par une valeur vide ou fausse.
 
 Attention à la diapositive « Un scénario chaîné » : `process.env.MINISHOP_API_TOKEN` n'est défini que si on
 l'exporte dans le terminal. Sinon le test envoie `Bearer undefined` et reçoit 401.
+
+## Atelier 6 — Contrat OpenAPI
+
+Fichiers : `tests/api/contrat.spec.ts` (13 tests : un par route et par code documenté), `docs/decisions.md`.
+
+### L'écart de contrat : `createdAt` / `created_at`
+
+Deux tests échouent, ceux qui reçoivent une commande :
+
+```
+POST /api/orders (201) ne respecte pas le contrat :
+  /createdAt : champ obligatoire absent
+```
+
+Le schéma `Order` de `openapi.yaml` rend `createdAt` obligatoire ; l'API renvoie `created_at`.
+Le test ne dit pas qui a tort. La décision retenue ici (corriger l'API, parce que le contrat est publié et que
+`SPEC.md` dit la même chose) est argumentée dans `docs/decisions.md`. La décision inverse se défend aussi si
+des clients utilisent déjà `created_at` : ce qui compte, c'est qu'elle soit écrite et justifiée.
+
+### Le lint
+
+`npx @redocly/cli lint public/openapi.yaml` : aucune erreur, deux avertissements à faire expliquer :
+
+- `no-server-example.com` : l'adresse du serveur est `localhost` — normal pour un projet de formation ;
+- `operation-4xx-response` : `GET /api/products` ne documente aucune réponse d'erreur — discutable, la route n'a pas d'entrée à refuser.
+
+### Schemathesis (bonus)
+
+Essayé lors de la préparation (avec podman), sur environ 1 200 requêtes générées en 20 secondes :
+
+```bash
+docker run --rm --network host ghcr.io/schemathesis/schemathesis:stable run http://localhost:8000/openapi.yaml --url http://localhost:8000 -H "Authorization: Bearer minishop-dev-token" --continue-on-failure
+```
+
+| Ce qu'il signale | Verdict |
+|---|---|
+| `Response violates schema` : « "createdAt" is a required property » sur les deux routes de commande | **Vrai** : l'écart de contrat de cet atelier |
+| `Schema-violating request accepted` : « qty: Value smaller than minimum » sur le devis et la commande | **Vrai** : le bug de la quantité 0 (atelier 5) |
+| `Schema-valid request rejected` : un coupon quelconque (`""`, `"0"`) est refusé avec 422 | **Faux positif** : le contrat dit « une chaîne », l'outil ne sait pas que seuls deux codes existent |
+| `Server error` / `Wrong response to undeclared method` : la méthode `QUERY` reçoit 501 | **Hors API** : c'est le serveur de développement de PHP qui répond, avant notre code |
+
+Deux pièges de la commande, à montrer :
+
+- sans `-H "Authorization: …"`, toutes les commandes répondent 401 et rien n'est exploré derrière ;
+- sans `--continue-on-failure`, il s'arrête au premier écart de chaque route : la quantité 0 reste cachée derrière le faux positif du coupon.
+
+Il a aussi trouvé deux vrais défauts involontaires pendant la préparation, corrigés depuis :
+`GET /api/orders/0` répondait 405, et un coupon `null` était accepté.
