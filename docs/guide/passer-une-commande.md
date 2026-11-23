@@ -2,7 +2,7 @@
 
 Ce guide vous montre comment commander un article sur MiniShop, du catalogue jusqu'à la confirmation, en utilisant un code promo.
 
-<video controls width="960" src="../media/commande.mp4">
+<video controls preload="metadata" width="960" src="../media/commande.mp4" poster="../media/commande-1.png">
   <track kind="captions" srclang="fr" label="Français" default src="../media/commande.vtt">
 </video>
 

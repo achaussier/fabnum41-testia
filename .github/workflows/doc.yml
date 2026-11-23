@@ -40,7 +40,17 @@ jobs:
       - name: Rapport Allure
         run: npx allure generate ./allure-results
 
-      # 3. Tout est conservé, même si une étape a échoué.
+      # 3. Le site statique : pages de site-doc/ + guide, vidéos, référence de l'API et rapports.
+      - uses: actions/setup-python@v6
+        with: { python-version: 3.x }
+      - name: Site de documentation (Zensical)
+        run: |
+          pip install zensical
+          bin/site
+      - uses: actions/upload-pages-artifact@v5
+        with: { path: site }
+
+      # 4. Tout est conservé, même si une étape a échoué.
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -57,3 +67,18 @@ jobs:
             docs/
             !docs/build/
             !docs/media/*.webm
+
+  # Mise en ligne sur GitHub Pages, uniquement pour un push sur la branche des solutions.
+  publication:
+    needs: doc
+    if: github.event_name == 'push' && github.ref == 'refs/heads/solutions-jour-2'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deploiement

@@ -1,0 +1,70 @@
+# Site de documentation de MiniShop, construit par Zensical (https://zensical.org).
+# Les pages écrites à la main sont dans site-doc/ ; bin/site y ajoute ce que les tests produisent
+# (guide, captures, vidéos), lance la construction, puis joint la référence de l'API et les rapports.
+
+[project]
+site_name = "MiniShop — documentation"
+site_description = "Documentation de la boutique MiniShop, produite à partir de ses tests."
+site_url = "https://achaussier.github.io/fabnum41-testia/"
+repo_url = "https://github.com/achaussier/fabnum41-testia"
+repo_name = "achaussier/fabnum41-testia"
+copyright = "Boutique de démonstration — formation « Tester avec l’IA ». Site régénéré par les tests à chaque push."
+docs_dir = "site-doc"
+site_dir = "site"
+use_directory_urls = false
+extra_css = ["stylesheets/extra.css"]
+nav = [
+  { "Accueil" = "index.md" },
+  { "Guide utilisateur" = [
+    { "Passer une commande" = "guide/passer-une-commande.md" },
+  ] },
+  { "API" = "api.md" },
+  { "Qualité" = [
+    { "Synthèse de recette" = "synthese.md" },
+    { "Rapports de tests" = "rapports.md" },
+    { "Décisions" = "decisions.md" },
+  ] },
+]
+
+[project.theme]
+language = "fr"
+logo = "assets/logo.svg"
+favicon = "assets/logo.svg"
+features = [
+  "content.code.copy",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.instant",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "search.highlight",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Passer en mode sombre"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Passer en mode clair"
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+md_in_html = {}
+tables = {}
+toc.permalink = true
+pymdownx.details = {}
+pymdownx.emoji.emoji_generator = "zensical.extensions.emoji.to_svg"
+pymdownx.emoji.emoji_index = "zensical.extensions.emoji.twemoji"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.superfences = {}

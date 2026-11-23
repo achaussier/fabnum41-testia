@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# bin/site — assemble et construit le site de documentation (Zensical).
+#
+# À lancer après les tests, quand la matière existe :
+#   npx playwright test --project=doc          → docs/build/, docs/media/ (captures, vidéos)
+#   ffmpeg … et php bin/sous-titres …          → docs/media/*.mp4 et *.vtt
+#   npx @redocly/cli build-docs …              → docs/api/index.html
+#   les rapports (facultatifs)                 → playwright-report/, allure-report/, rapports/unit.html
+#
+# Résultat : le dossier site/, prêt à être publié.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# 1. Ce que les tests ont produit rejoint les pages écrites à la main (site-doc/).
+mkdir -p site-doc/guide site-doc/media
+cp docs/guide/*.md site-doc/guide/
+cp docs/decisions.md site-doc/decisions.md
+cp rapports/synthese.md site-doc/synthese.md
+for fichier in docs/media/*.png docs/media/*.mp4 docs/media/*.vtt; do
+  if [ -e "$fichier" ]; then cp "$fichier" site-doc/media/; fi
+done
+
+# 2. Construction du site dans site/.
+zensical build --clean
+
+# 3. Les documents déjà en HTML sont joints tels quels.
+mkdir -p site/reference-api site/rapports-tests
+cp docs/api/index.html site/reference-api/index.html
+cp public/openapi.yaml site/reference-api/openapi.yaml
+if [ -d playwright-report ]; then cp -r playwright-report site/rapports-tests/playwright; fi
+if [ -d allure-report ]; then cp -r allure-report site/rapports-tests/allure; fi
+if [ -f rapports/unit.html ]; then cp rapports/unit.html site/rapports-tests/unit.html; fi
+
+echo "✔ site/ ($(find site -type f | wc -l) fichiers)"

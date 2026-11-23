@@ -164,7 +164,19 @@ Deux choix à discuter :
   ils sont rouges, et on veut quand même les rapports ;
 - les tests de **documentation**, eux, arrêtent le workflow s'ils échouent : mieux vaut pas de guide qu'un guide faux.
 
-Ce workflow n'a pas été exécuté sur GitHub lors de la préparation.
+Le workflow construit aussi un **site statique** avec [Zensical](https://zensical.org) et le publie sur GitHub Pages :
+<https://achaussier.github.io/fabnum41-testia/>.
+
+- `site-doc/` : les pages écrites à la main (accueil, API, rapports) et la feuille de style ;
+- `zensical.toml` : la configuration du site (navigation, couleurs) ;
+- `bin/site` : copie dans `site-doc/` ce que les tests ont produit (guide, captures, vidéos, synthèse, décisions),
+  lance `zensical build`, puis joint la référence de l'API (Redocly) et les rapports (Playwright, Allure, TestDox).
+
+Seul un push sur `solutions-jour-2` met le site en ligne (job `publication`). Pour le construire en local,
+après avoir généré la documentation et les rapports : `pip install zensical`, puis `bin/site`, et ouvrir `site/index.html`
+(ou `zensical serve`).
+
+Le site publie les rapports, donc les tests en échec : c'est assumé ici, toutes les données étant fictives.
 
 ## Bonus A, B, C et E : essayés, non fournis
 

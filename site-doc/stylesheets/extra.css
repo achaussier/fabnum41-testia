@@ -1,0 +1,149 @@
+/* Couleurs de MiniShop : bleu nuit de l'en-tête, bleu des boutons. */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #102a43;
+  --md-primary-fg-color--light: #243b53;
+  --md-primary-fg-color--dark: #0b1f33;
+  --md-primary-bg-color: #ffffff;
+  --md-accent-fg-color: #1d4ed8;
+  --md-typeset-a-color: #1d4ed8;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #102a43;
+  --md-accent-fg-color: #7aa2ff;
+  --md-typeset-a-color: #7aa2ff;
+}
+
+/* Page d'accueil : bandeau */
+.ms-hero {
+  margin: 0 0 2rem;
+  padding: 2.4rem 2rem;
+  border-radius: 14px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #102a43 0%, #1d4ed8 100%);
+}
+
+.md-typeset .ms-hero h1 {
+  margin: 0 0 0.6rem;
+  color: #ffffff;
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.md-typeset .ms-hero p {
+  max-width: 44rem;
+  margin: 0 0 1.2rem;
+  font-size: 0.95rem;
+  opacity: 0.92;
+}
+
+.md-typeset .ms-hero .md-button {
+  margin: 0 0.5rem 0.4rem 0;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+}
+
+.md-typeset .ms-hero .md-button--primary {
+  background: #ffffff;
+  color: #102a43;
+}
+
+.md-typeset .ms-hero .md-button:hover {
+  border-color: #dbeafe;
+  background: #dbeafe;
+  color: #102a43;
+}
+
+/* Cartes */
+.md-typeset .ms-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 2rem;
+}
+
+.md-typeset .ms-card,
+.md-typeset .ms-card:hover {
+  text-decoration: none;
+}
+
+.md-typeset .ms-card {
+  display: block;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 12px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color) !important;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.md-typeset .ms-card:hover {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 6px 18px rgba(16, 42, 67, 0.12);
+  transform: translateY(-2px);
+}
+
+.md-typeset .ms-card strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+  color: var(--md-accent-fg-color);
+}
+
+.md-typeset .ms-card span {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Étapes de la chaîne « des tests à la documentation » */
+.md-typeset ol.ms-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 2rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: etape;
+}
+
+.md-typeset ol.ms-steps li {
+  margin: 0 !important;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  background: var(--md-code-bg-color);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  counter-increment: etape;
+}
+
+.md-typeset ol.ms-steps li::before {
+  content: counter(etape, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+  color: var(--md-accent-fg-color);
+}
+
+/* Captures du guide et vidéos */
+.md-typeset img[src*="media/"],
+.md-typeset video {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(16, 42, 67, 0.1);
+}
+
+/* Référence de l'API intégrée */
+.ms-frame {
+  width: 100%;
+  height: 75vh;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 10px;
+  background: #ffffff;
+}

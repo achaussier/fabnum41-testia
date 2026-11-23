@@ -13,3 +13,10 @@ test-results/
 playwright-report/
 .env
 .phpunit.cache/
+
+# Site de documentation : dossier construit, et contenus copiés par bin/site
+site/
+site-doc/guide/
+site-doc/media/
+site-doc/decisions.md
+site-doc/synthese.md
