@@ -25,7 +25,7 @@ declare(strict_types=1);
 const API_URL        = 'https://api.anthropic.com/v1/messages';
 const API_VERSION    = '2023-06-01';
 const DEFAULT_MODEL  = 'claude-sonnet-5-5';
-const MAX_TOKENS     = 8000;
+const MAX_TOKENS     = 16000;
 const RULES_FILE     = 'REGLES-IA.md';
 const MAX_FILE_BYTES = 200_000;
 
