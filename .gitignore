@@ -1,6 +1,7 @@
 # Jour 2 : fichiers produits par les tests et les ateliers (ils se régénèrent)
 var/
-rapports/
+rapports/*
+!rapports/synthese.md
 allure-results/
 allure-report/
 docs/build/

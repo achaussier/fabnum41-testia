@@ -2,8 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
+    ['list'],                                       // terminal
+    ['html', { open: 'never' }],                    // développeurs
+    ['junit', { outputFile: 'rapports/e2e.xml' }],  // CI
+    ['allure-playwright'],                          // tendances
   ],
   use: {
     baseURL: 'http://localhost:8000',

@@ -113,3 +113,21 @@ Deux pièges de la commande, à montrer :
 
 Il a aussi trouvé deux vrais défauts involontaires pendant la préparation, corrigés depuis :
 `GET /api/orders/0` répondait 405, et un coupon `null` était accepté.
+
+## Atelier 7 — Rapports et synthèse
+
+- `playwright.config.ts` : reporters `list`, `html`, `junit` (`rapports/e2e.xml`) et `allure-playwright`.
+- `tests/e2e/achat.spec.ts` et `tests/e2e/coupon.spec.ts` (test « code expiré ») : `test.step`, `tag`, `annotation`.
+  `npx playwright test --grep @critique` ne lance que le parcours d'achat.
+- `rapports/synthese.md` : un exemple de synthèse. `rapports/` n'est pas versionné, sauf ce fichier.
+
+Chiffres de référence à la fin de l'atelier 7 (le test de documentation de l'atelier 8 ajoute ensuite un test Playwright) :
+
+| Suite | Tests | Échecs |
+|---|---|---|
+| PHPUnit | 38 | 1 (« pile 50 euros ») |
+| Playwright (`api`, `e2e`, `doc`) | 58 | 4 (quantité nulle, 50 € pile, deux tests de contrat) |
+| Total | 96 | 5, pour 3 défauts |
+
+Points à vérifier dans une synthèse générée : le total (l'IA additionne-t-elle bien les deux fichiers ?),
+le regroupement (5 tests rouges, mais 3 problèmes), le nom exact des tests, et l'absence de cause inventée pour `createdAt`.
