@@ -16,7 +16,7 @@ final class CouponValidator
         $code = mb_strtoupper(trim($code));
 
         if (in_array($code, self::EXPIRED, true)) {
-            throw new InvalidCouponException('Ce code a expiré');
+            throw new ExpiredCouponException('Ce code a expiré');
         }
 
         return match ($code) {

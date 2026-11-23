@@ -1,0 +1,92 @@
+# Carnet de requêtes de l'API MiniShop.
+#
+# Dans VS Code : installer l'extension « REST Client », puis cliquer sur « Send Request »
+# au-dessus d'une requête. (Format aussi compris par le client HTTP des éditeurs JetBrains.)
+# Le serveur doit tourner : php -S localhost:8000 -t public
+#
+# Le contrat complet de l'API est dans public/openapi.yaml.
+
+@adresse = http://localhost:8000
+# Jeton de formation. En vrai projet, un jeton ne s'écrit jamais dans un fichier versionné.
+@jeton = minishop-dev-token
+
+### Catalogue — tous les produits (200)
+GET {{adresse}}/api/products
+
+### Un produit (200)
+GET {{adresse}}/api/products/carnet-a5
+
+### Un produit qui n'existe pas (404)
+GET {{adresse}}/api/products/licorne
+
+### Devis sans coupon (200)
+POST {{adresse}}/api/quote
+Content-Type: application/json
+
+{ "lines": [{ "sku": "carnet-a5", "qty": 2 }] }
+
+### Devis avec coupon (200)
+POST {{adresse}}/api/quote
+Content-Type: application/json
+
+{ "lines": [{ "sku": "carnet-a5", "qty": 2 }], "coupon": "BIENVENUE10" }
+
+### Devis — produit inconnu (404)
+POST {{adresse}}/api/quote
+Content-Type: application/json
+
+{ "lines": [{ "sku": "licorne", "qty": 1 }] }
+
+### Devis — coupon expiré (410)
+POST {{adresse}}/api/quote
+Content-Type: application/json
+
+{ "lines": [{ "sku": "carnet-a5", "qty": 1 }], "coupon": "NOEL2025" }
+
+### Devis — quantité trop grande (422)
+POST {{adresse}}/api/quote
+Content-Type: application/json
+
+{ "lines": [{ "sku": "carnet-a5", "qty": 11 }] }
+
+### Commande (201) — notez l'en-tête Location de la réponse
+# @name commande
+POST {{adresse}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{jeton}}
+
+{
+  "customer": { "name": "Alice Martin", "email": "alice@example.test" },
+  "lines": [{ "sku": "carnet-a5", "qty": 2 }],
+  "coupon": "BIENVENUE10"
+}
+
+### Commande sans jeton (401)
+POST {{adresse}}/api/orders
+Content-Type: application/json
+
+{
+  "customer": { "name": "Alice Martin", "email": "alice@example.test" },
+  "lines": [{ "sku": "carnet-a5", "qty": 2 }]
+}
+
+### Commande — e-mail invalide (422)
+POST {{adresse}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{jeton}}
+
+{
+  "customer": { "name": "Alice Martin", "email": "alice-sans-arobase" },
+  "lines": [{ "sku": "carnet-a5", "qty": 2 }]
+}
+
+### Relire la commande créée plus haut (200) — envoyer d'abord la requête « Commande (201) »
+GET {{adresse}}/api/orders/{{commande.response.body.id}}
+Authorization: Bearer {{jeton}}
+
+### Relire une commande sans jeton (401)
+GET {{adresse}}/api/orders/{{commande.response.body.id}}
+
+### Relire une commande qui n'existe pas (404)
+GET {{adresse}}/api/orders/inconnue
+Authorization: Bearer {{jeton}}

@@ -14,12 +14,12 @@ final class Catalog
     public function __construct()
     {
         $list = [
-            new Product('CARNET-A5', 'Carnet A5', 1290, 'carnet.svg'),
-            new Product('STYLO-PLUME', 'Stylo plume', 2450, 'stylo.svg'),
-            new Product('AGENDA', 'Agenda semainier', 1800, 'agenda.svg'),
-            new Product('CRAYONS', 'Lot de 3 crayons', 450, 'crayons.svg'),
-            new Product('TROUSSE', 'Trousse en toile', 990, 'trousse.svg'),
-            new Product('LAMPE', 'Lampe de bureau', 5000, 'lampe.svg'),
+            new Product('CARNET-A5', 'Carnet A5', 1290, 'carnet.svg', 40),
+            new Product('STYLO-PLUME', 'Stylo plume', 2450, 'stylo.svg', 12),
+            new Product('AGENDA', 'Agenda semainier', 1800, 'agenda.svg', 25),
+            new Product('CRAYONS', 'Lot de 3 crayons', 450, 'crayons.svg', 80),
+            new Product('TROUSSE', 'Trousse en toile', 990, 'trousse.svg', 18),
+            new Product('LAMPE', 'Lampe de bureau', 5000, 'lampe.svg', 6),
         ];
         foreach ($list as $product) {
             $this->products[$product->sku] = $product;

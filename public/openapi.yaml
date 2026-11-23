@@ -1,0 +1,281 @@
+openapi: 3.1.0
+info:
+  title: API MiniShop
+  version: 1.0.0
+  summary: Catalogue, devis et commandes de la boutique MiniShop.
+  description: |
+    API JSON de la boutique de démonstration MiniShop.
+
+    - Tous les montants sont des entiers, en **centimes** : 12,90 € = `1290`.
+    - Les erreurs ont toujours la même forme : `{"error": "message lisible", "code": "identifiant_court"}`.
+    - Les routes de commande demandent un jeton : en-tête `Authorization: Bearer <jeton>`.
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+servers:
+  - url: http://localhost:8000
+    description: Serveur local de formation
+tags:
+  - name: Catalogue
+    description: Les produits en vente.
+  - name: Devis
+    description: Calcul du prix d'un panier, sans rien enregistrer.
+  - name: Commandes
+    description: Création et lecture des commandes (jeton obligatoire).
+paths:
+  /api/products:
+    get:
+      operationId: listerProduits
+      security: []
+      tags: [Catalogue]
+      summary: Liste du catalogue
+      description: Renvoie tous les produits du catalogue.
+      responses:
+        '200':
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Product' }
+  /api/products/{sku}:
+    get:
+      operationId: lireProduit
+      security: []
+      tags: [Catalogue]
+      summary: Un produit
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          description: Référence du produit (la casse est ignorée).
+          schema: { type: string }
+          example: carnet-a5
+      responses:
+        '200':
+          description: Le produit
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '404':
+          description: Produit inconnu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /api/quote:
+    post:
+      operationId: calculerDevis
+      security: []
+      tags: [Devis]
+      summary: Calculer un devis
+      description: |
+        Calcule le prix d'un panier, avec un code promo facultatif. Rien n'est enregistré.
+        Les règles de calcul (livraison, réduction) sont celles de SPEC.md.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuoteRequest' }
+            example:
+              lines: [{ sku: carnet-a5, qty: 2 }]
+              coupon: BIENVENUE10
+      responses:
+        '200':
+          description: Devis calculé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quote' }
+              example: { subtotal: 2580, discount: 258, shipping: 490, total: 2812 }
+        '404':
+          description: Produit inconnu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '410':
+          description: Coupon expiré
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Panier ou coupon invalide
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /api/orders:
+    post:
+      operationId: creerCommande
+      tags: [Commandes]
+      summary: Passer une commande
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderRequest' }
+      responses:
+        '201':
+          description: Commande enregistrée
+          headers:
+            Location:
+              description: Adresse de la commande créée.
+              schema: { type: string }
+              example: /api/orders/8a9f6e36e6c4
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '401':
+          description: Jeton absent ou invalide
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Données refusées
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /api/orders/{id}:
+    get:
+      operationId: lireCommande
+      tags: [Commandes]
+      summary: Relire une commande
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: La commande
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '401':
+          description: Jeton absent ou invalide
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: Commande inconnue
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Jeton d'accès, transmis dans l'en-tête `Authorization`.
+  schemas:
+    Product:
+      type: object
+      description: Un produit du catalogue.
+      required: [sku, name, price, stock]
+      properties:
+        sku:
+          type: string
+          description: Référence du produit.
+          example: carnet-a5
+        name:
+          type: string
+          example: Carnet A5
+        price:
+          type: integer
+          description: Prix unitaire, en centimes.
+          example: 1290
+        stock:
+          type: integer
+          minimum: 0
+    Line:
+      type: object
+      description: Une ligne de panier.
+      required: [sku, qty]
+      properties:
+        sku:
+          type: string
+          example: carnet-a5
+        qty:
+          type: integer
+          description: Quantité, de 1 à 10 par produit.
+          minimum: 1
+          maximum: 10
+    QuoteRequest:
+      type: object
+      required: [lines]
+      properties:
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Line' }
+        coupon:
+          type: string
+          description: Code promo (facultatif, un seul par commande).
+    Quote:
+      type: object
+      description: Détail d'un prix, en centimes.
+      required: [subtotal, discount, shipping, total]
+      properties:
+        subtotal:
+          type: integer
+          description: Somme des lignes, avant réduction.
+        discount:
+          type: integer
+          description: Réduction apportée par le coupon.
+        shipping:
+          type: integer
+          description: Frais de livraison.
+        total:
+          type: integer
+          description: Montant à payer.
+    Customer:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+    OrderRequest:
+      type: object
+      required: [customer, lines]
+      properties:
+        customer: { $ref: '#/components/schemas/Customer' }
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Line' }
+        coupon:
+          type: string
+    Order:
+      type: object
+      required: [id, status, total, createdAt]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [confirmed]
+        total:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        customer: { $ref: '#/components/schemas/Customer' }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/Line' }
+    Error:
+      type: object
+      required: [error, code]
+      properties:
+        error:
+          type: string
+          description: Message lisible par un humain.
+        code:
+          type: string
+          description: Identifiant court de l'erreur.
+          example: produit_inconnu

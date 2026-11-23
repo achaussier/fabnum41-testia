@@ -1,13 +1,44 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests/e2e',
-  reporter: [['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+  ],
   use: {
     baseURL: 'http://localhost:8000',
   },
+  // Les images de référence gardent le même nom qu'au jour 1 (…-chromium-linux.png)
+  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-chromium-{platform}{ext}',
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Tests d'API : pas de navigateur, le jeton est ajouté à chaque requête
+    {
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        extraHTTPHeaders: {
+          Authorization: `Bearer ${process.env.MINISHOP_API_TOKEN ?? 'minishop-dev-token'}`,
+        },
+      },
+    },
+    // Tests de bout en bout du jour 1
+    {
+      name: 'e2e',
+      testDir: './tests/e2e',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    // Tests qui produisent la documentation : filmés, ralentis, taille fixe
+    {
+      name: 'doc',
+      testDir: './tests/doc',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        video: { mode: 'on', size: { width: 1280, height: 720 } },
+        launchOptions: { slowMo: 400 }, // 0,4 s entre actions
+        locale: 'fr-FR',
+      },
+    },
   ],
   // Playwright démarre le serveur PHP tout seul
   webServer: {

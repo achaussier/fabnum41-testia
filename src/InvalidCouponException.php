@@ -6,6 +6,6 @@ namespace MiniShop;
 
 use DomainException;
 
-final class InvalidCouponException extends DomainException
+class InvalidCouponException extends DomainException
 {
 }

@@ -42,11 +42,33 @@ npx playwright show-report       # rapport HTML du dernier lancement
 Au départ, le dépôt ne contient qu'un test d'exemple de chaque sorte : les autres sont à écrire
 pendant les ateliers.
 
+## Jour 2 : l'API, les rapports, la documentation
+
+L'application expose aussi une API JSON sous `/api`, décrite par `public/openapi.yaml` et par la section « API » de `SPEC.md`.
+La commande de démarrage ne change pas.
+
+```bash
+curl -s localhost:8000/api/products
+```
+
+Les tests Playwright sont répartis en trois projets :
+
+```bash
+npx playwright test --project=api    # tests d'API, sans navigateur
+npx playwright test --project=e2e    # parcours dans le navigateur (jour 1)
+npx playwright test --project=doc    # tests filmés qui produisent docs/media/ et docs/build/
+```
+
+Le jeton des routes de commande est lu dans la variable `MINISHOP_API_TOKEN` (valeur de formation : `minishop-dev-token`).
+Pour la conversion des vidéos de l'atelier 8, il faut aussi `ffmpeg`.
+
 ## Organisation du projet
 
 ```
 minishop/
 ├── public/            pages web : catalogue, panier, commande, confirmation, style.css
+│   ├── api/           API JSON : catalogue, devis, commandes (jour 2)
+│   └── openapi.yaml   le contrat de l'API (jour 2)
 ├── templates/         en-tête, pied de page et initialisation communs aux pages
 ├── src/               logique métier
 │   ├── PriceCalculator.php    livraison, réduction, total
@@ -55,10 +77,15 @@ minishop/
 │   └── Catalog.php            les 6 produits
 ├── tests/
 │   ├── Unit/          tests PHPUnit
-│   └── e2e/           tests Playwright
+│   ├── e2e/           tests Playwright
+│   ├── api/           tests d'API, sans navigateur (jour 2)
+│   └── doc/           tests qui produisent la documentation (jour 2)
 ├── ateliers/          guides des ateliers
 │   └── prompts/       prompts prêts à l'emploi (à utiliser avec --prompt-file)
 ├── bin/ia             script qui appelle l'API Claude
+├── bin/sous-titres    fabrique les sous-titres d'une vidéo de documentation (jour 2)
+├── api.http           requêtes prêtes à l'emploi pour explorer l'API (jour 2)
+├── docs/              documentation produite à partir des tests (jour 2)
 ├── SPEC.md            règles métier : la référence
 └── REGLES-IA.md       consignes envoyées à l'IA à chaque appel
 ```
@@ -136,5 +163,13 @@ Un guide pas à pas par atelier, avec ce que vous devez voir à chaque étape et
 | `04-tests-visuels.md` | 4 | Un `toHaveScreenshot` par page, zones dynamiques masquées |
 | `05-analyse-echec.md` | 3 | Diagnostiquer un échec : bug de l'appli ou du test ? |
 | `06-diff-visuel.md` | 4 | Décrire les différences entre attendu, obtenu et différence |
+| `07-tests-api.md` | 5 | Tests d'API d'une route d'après le contrat et la spec |
+| `08-tests-contrat.md` | 6 | Un test de conformité au contrat par route et par code |
+| `09-synthese.md` | 7 | Synthèse de recette pour un non-technicien |
+| `10a-test-doc.md` | 8 | Convertir un test E2E en test de documentation |
+| `10-guide.md` | 8 | Rédiger le guide utilisateur depuis le manifeste et les captures |
+| `11-sous-titres.md` | 8 | Reformuler les sous-titres d'une vidéo |
+| `12-enrichir-openapi.md` | bonus | Compléter descriptions et exemples du contrat |
+| `13-trace.md` | bonus | Matrice de traçabilité spec ↔ tests |
 
 Chaque fichier commence par la commande complète à lancer. Modifiez-les : notez ce qui marche mieux.

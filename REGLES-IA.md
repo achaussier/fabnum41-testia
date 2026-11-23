@@ -10,6 +10,12 @@
 - Sélecteurs getByRole / getByLabel / getByTestId
 - Jamais de waitForTimeout
 
+## Tests d'API
+- Playwright, fixture request : vérifier le code, les en-têtes, puis le corps
+- Valeurs attendues calculées depuis SPEC.md, calcul en commentaire
+- Jeton lu dans process.env.MINISHOP_API_TOKEN, jamais écrit dans un test
+- Données fictives uniquement (e-mails en example.test)
+
 ## Toujours
 - SPEC.md fait foi, pas le code
 - N'utiliser que des méthodes qui existent

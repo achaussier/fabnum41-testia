@@ -11,6 +11,7 @@ final class Product
         public readonly string $name,
         public readonly int $price, // en centimes
         public readonly string $image,
+        public readonly int $stock = 0,
     ) {
     }
 }

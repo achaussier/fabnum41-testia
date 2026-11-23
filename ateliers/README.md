@@ -11,6 +11,16 @@ Un guide par atelier, à suivre dans l'ordre. Le but est que vous **cherchiez**,
 | [Atelier 4 — Régression visuelle](atelier-4.md) | 35 min | des références, une divergence détectée |
 | [Bonus](bonus.md) | — | pour les plus rapides |
 
+**Jour 2**
+
+| Guide | Durée | On repart avec… |
+|---|---|---|
+| [Atelier 5 — Explorer et tester l'API](atelier-5.md) | 50 min | une dizaine de tests d'API |
+| [Atelier 6 — Contrat OpenAPI](atelier-6.md) | 40 min | des tests de contrat, un écart tranché |
+| [Atelier 7 — Rapports et synthèse IA](atelier-7.md) | 35 min | rapports HTML, JUnit, Allure, une synthèse vérifiée |
+| [Atelier 8 — Guide utilisateur et vidéos](atelier-8.md) | 50 min | un guide illustré, une vidéo sous-titrée |
+| [Bonus du jour 2](bonus-jour-2.md) | — | pour les plus rapides |
+
 ## Comment lire un guide
 
 - Chaque étape donne la commande à lancer, puis **ce que vous devez voir**. Si vous voyez autre chose, lisez l'encadré « Si ça coince » en bas du guide avant d'appeler à l'aide.
@@ -40,6 +50,16 @@ Dans l'ordre :
 | `solution-atelier-3` | + la configuration des preuves et les captures |
 | `solution-atelier-4` | + les tests visuels et leurs références |
 | `solutions` | tout, plus les bonus accessibilité et CI |
+
+Jour 2 (la branche `depart-jour-2` est le point de départ : l'application du jour 2 avec des tests du jour 1) :
+
+| Branche | Contient |
+|---|---|
+| `solution-atelier-5` | les tests d'API |
+| `solution-atelier-6` | + les tests de contrat et la décision |
+| `solution-atelier-7` | + les tests enrichis et les rapports |
+| `solution-atelier-8` | + le test de documentation et le guide |
+| `solutions-jour-2` | tout, plus les bonus |
 
 Regarder un fichier de solution sans quitter votre travail :
 

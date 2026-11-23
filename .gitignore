@@ -4,3 +4,11 @@ test-results/
 playwright-report/
 .env
 .phpunit.cache/
+
+# Jour 2 : fichiers produits par les tests et les ateliers (ils se régénèrent)
+var/
+rapports/
+allure-results/
+allure-report/
+docs/build/
+docs/media/

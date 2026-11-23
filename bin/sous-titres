@@ -1,0 +1,92 @@
+#!/usr/bin/env php
+<?php
+/**
+ * bin/sous-titres — fabrique les sous-titres (.vtt) d'une vidéo de documentation.
+ *
+ * Formation « Tester avec l'IA » — aucune IA ici : le script lit le manifeste écrit par
+ * un test de documentation (docs/build/<nom>.json) et en tire un fichier WebVTT.
+ * Chaque étape est affichée de son début jusqu'au début de la suivante ; la dernière dure 3 secondes.
+ *
+ * Exemples :
+ *   php bin/sous-titres docs/build/commande.json
+ *   php bin/sous-titres docs/build/commande.json --depuis sous-titres.txt
+ *
+ * --depuis F : remplace les titres des étapes par les lignes du fichier F
+ *              (une ligne par étape, dans l'ordre : c'est la sortie du prompt 11).
+ */
+
+declare(strict_types=1);
+
+const DUREE_DERNIERE_ETAPE = 3.0;
+
+function fail(string $message): never
+{
+    fwrite(STDERR, "✘ $message\n");
+    exit(1);
+}
+
+// ---------------------------------------------------------------- arguments
+$manifestFile = null;
+$textsFile = null;
+$args = array_slice($argv, 1);
+for ($i = 0; $i < count($args); $i++) {
+    if ($args[$i] === '-h' || $args[$i] === '--help') {
+        echo "Usage : php bin/sous-titres docs/build/<nom>.json [--depuis fichier.txt]\n";
+        exit(0);
+    }
+    if ($args[$i] === '--depuis') {
+        $textsFile = $args[++$i] ?? fail("l'option --depuis attend un fichier");
+    } elseif (str_starts_with($args[$i], '--')) {
+        fail("option inconnue : {$args[$i]}");
+    } else {
+        $manifestFile = $args[$i];
+    }
+}
+if ($manifestFile === null) {
+    fail('indiquez le manifeste : php bin/sous-titres docs/build/<nom>.json');
+}
+if (!is_file($manifestFile)) {
+    fail("manifeste introuvable : $manifestFile (lancez d'abord npx playwright test --project=doc)");
+}
+
+// ---------------------------------------------------------------- lecture
+$manifest = json_decode((string) file_get_contents($manifestFile), true);
+$steps = $manifest['etapes'] ?? null;
+if (!is_array($steps) || $steps === []) {
+    fail("aucune étape dans $manifestFile");
+}
+
+$texts = array_column($steps, 'titre');
+if ($textsFile !== null) {
+    if (!is_file($textsFile)) {
+        fail("fichier introuvable : $textsFile");
+    }
+    // Une ligne par étape ; les lignes vides sont ignorées.
+    $lines = preg_split('/\R/u', (string) file_get_contents($textsFile));
+    $texts = array_values(array_filter(array_map('trim', $lines), fn (string $line): bool => $line !== ''));
+    if (count($texts) !== count($steps)) {
+        fail(sprintf('%s contient %d ligne(s) pour %d étape(s) : il en faut une par étape', $textsFile, count($texts), count($steps)));
+    }
+}
+
+// ---------------------------------------------------------------- écriture
+/** 65.4 → « 01:05.400 » */
+function timestamp(float $seconds): string
+{
+    $ms = (int) round($seconds * 1000);
+
+    return sprintf('%02d:%02d.%03d', intdiv($ms, 60000), intdiv($ms % 60000, 1000), $ms % 1000);
+}
+
+$vtt = "WEBVTT\n";
+foreach ($steps as $index => $step) {
+    $start = (float) $step['debut'];
+    $end = isset($steps[$index + 1]) ? (float) $steps[$index + 1]['debut'] : $start + DUREE_DERNIERE_ETAPE;
+    $vtt .= "\n" . timestamp($start) . ' --> ' . timestamp($end) . "\n" . $texts[$index] . "\n";
+}
+
+$name = basename($manifestFile, '.json');
+$output = 'docs/media/' . $name . '.vtt';
+@mkdir(dirname($output), 0777, true);
+file_put_contents($output, $vtt);
+echo "✔ $output\n";
