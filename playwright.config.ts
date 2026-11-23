@@ -7,6 +7,10 @@ export default defineConfig({
   ],
   use: {
     baseURL: 'http://localhost:8000',
+    // Preuves en cas d'échec (atelier 3)
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
   // Les images de référence gardent le même nom qu'au jour 1 (…-chromium-linux.png)
   snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-chromium-{platform}{ext}',
