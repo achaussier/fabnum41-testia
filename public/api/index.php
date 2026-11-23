@@ -71,12 +71,12 @@ try {
     $orders  = new OrderRepository(__DIR__ . '/../../var/orders.json');
 
     $known = match (true) {
-        count($segments) > 2                => null,
-        $resource === 'products'            => ['GET'],
-        $resource === 'quote' && !$id       => ['POST'],
-        $resource === 'orders' && !$id      => ['POST'],
-        $resource === 'orders'              => ['GET'],
-        default                             => null,
+        count($segments) > 2                   => null,
+        $resource === 'products'               => ['GET'],
+        $resource === 'quote' && $id === null  => ['POST'],
+        $resource === 'orders' && $id === null => ['POST'],
+        $resource === 'orders'                 => ['GET'],
+        default                                => null,
     };
     if ($known === null) {
         throw new ApiException(404, 'route_inconnue', 'Cette adresse n’existe pas dans l’API');

@@ -113,6 +113,10 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/OrderRequest' }
+            example:
+              customer: { name: Alice Martin, email: alice@example.test }
+              lines: [{ sku: carnet-a5, qty: 2 }]
+              coupon: BIENVENUE10
       responses:
         '201':
           description: Commande enregistrée

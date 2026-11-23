@@ -75,10 +75,16 @@ git commit -m "tests: conformité au contrat, décision sur l'écart"
 Le serveur PHP doit tourner. Schemathesis lit le contrat et fabrique lui-même des centaines de requêtes :
 
 ```bash
-docker run --rm --network host ghcr.io/schemathesis/schemathesis:stable run http://localhost:8000/openapi.yaml --url http://localhost:8000
+docker run --rm --network host ghcr.io/schemathesis/schemathesis:stable run http://localhost:8000/openapi.yaml --url http://localhost:8000 -H "Authorization: Bearer minishop-dev-token" --continue-on-failure
 ```
 
-Que trouve-t-il ? Retrouvez-vous vos deux découvertes de l'après-midi ? Y a-t-il des faux positifs ?
+- `-H "Authorization: …"` : sans le jeton, toutes les commandes répondent 401 et il n'explore rien derrière ;
+- `--continue-on-failure` : sans cette option, il s'arrête au premier écart de chaque route.
+
+(Avec podman, remplacez `docker` par `podman`.)
+
+Triez ce qu'il trouve, écart par écart : retrouvez-vous vos deux découvertes de l'après-midi ?
+Lesquels sont de vrais problèmes, lesquels sont des faux positifs (un outil qui ne connaît pas les règles métier) ?
 
 ## C'est réussi si…
 

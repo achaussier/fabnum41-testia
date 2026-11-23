@@ -70,7 +70,7 @@ final class QuoteService
         }
 
         $coupon = null;
-        if (array_key_exists('coupon', $body) && $body['coupon'] !== null) {
+        if (array_key_exists('coupon', $body)) {
             if (!is_string($body['coupon'])) {
                 throw new ApiException(422, 'coupon_invalide', 'Code promo invalide');
             }
